@@ -20,10 +20,8 @@ object MemoDemo {
 
       mem.get(a) match {
         case Some(found) =>
-          println("found in cache")
           (Memo(f, mem), found)
         case None =>
-          println("calculating")
           val b = f(a)
           (Memo(f, mem updated (a, b)), b)
       }
@@ -46,28 +44,30 @@ object MemoDemo {
     // simple function application
 
     // Create a function to memoize with
-    def sampleFunc(n: Int) : String = (n + 2).toString.reverse
+    def sampleFunc(n: Int) : String = {
+      println("calculating")
+      s">${(n + 2).toString.reverse}<"
+    }
 
     // Simple invocation
     val test1 = sampleFunc(10)
-    println(test1)
+    println("1)" + test1)
 
     // Memoized
 
     // create the initialize Memo state and call with a test value
     // this will calculate because the cache is initially empty
     val result = callM(12).run(Memo[Int,String](sampleFunc))
-    println(result.value._2)
+    println("2a)" + result.value._2)
 
     // call again with the new cache state
     // will use cached version
     val result2 = callM(12).run(result.value._1)
-    println(result2.value._2)
+    println("2b)" + result2.value._2)
 
     // State monad memo function used from for comprehension
 
     val test4 = for (
-
       v1 <- callM[Int,String](10);
       v2 <- callM(12);
       v3 <- callM(10)
@@ -75,7 +75,7 @@ object MemoDemo {
 
     val result3 = test4.run(Memo[Int,String](sampleFunc))
 
-    print(result3.value._2)
+    print("3)" + result3.value._2)
 
     // TODO run over a list of inputs using fold
 
