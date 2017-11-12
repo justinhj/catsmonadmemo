@@ -1,8 +1,5 @@
-import cats.Eval
-import cats.data.IndexedStateT
 import cats.data.State
 
-import scala.annotation.tailrec
 import scala.collection.immutable.Map
 
 // see https://typelevel.org/cats/datatypes/state.html
@@ -39,13 +36,22 @@ object MemoDemo {
     )
   }
 
+  // fold over a sequence of inputs generate the results and the final state
+
+  def foldState[A,B](inputs: List[A], f : A => B) =
+    inputs.foldLeft((Memo[A,B](f), List.empty[B])){
+      case ((state : Memo[A,B], acc : List[B]), input) =>
+        val result = callM(input).run(state).value
+        (result._1, result._2 :: acc)
+    }
+
   def main(args : Array[String]) : Unit = {
 
     // simple function application
 
     // Create a function to memoize with
     def sampleFunc(n: Int) : String = {
-      println("calculating")
+      println(s"calculating $n")
       s">${(n + 2).toString.reverse}<"
     }
 
@@ -75,11 +81,23 @@ object MemoDemo {
 
     val result3 = test4.run(Memo[Int,String](sampleFunc))
 
-    print("3)" + result3.value._2)
+    println("3)" + result3.value._2)
 
-    // TODO run over a list of inputs using fold
+    // run over a list of inputs
 
+    val inputs = List(10,12,13,12,10,13,10,10,10,13,12,13,10,10)
 
+    val result5 = inputs.foldLeft((Memo[Int,String](sampleFunc), List.empty[String])){
+      case ((state : Memo[Int,String], acc : List[String]), input) =>
+        val result = callM[Int, String](input).run(state).value
+        (result._1, result._2 :: acc)
+    }
+
+    println("5) " + result5._2)
+
+    val result6 = foldState(inputs, sampleFunc)
+
+    println("6) " + result6._2)
 
   }
 
