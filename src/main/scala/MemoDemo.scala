@@ -125,7 +125,7 @@ object MemoDemo {
 
     val result7b = callMMany[Int,String](List(10, 12, 20, 24), result7)
 
-    val runResult7: (Memo[Int, String], List[String]) = result7b.run(Memo[Int,String](sampleFunc, Map.empty)).value
+    val runResult7 = result7b.run(Memo[Int,String](sampleFunc, Map.empty)).value
 
     println("7) " + runResult7)
   }
