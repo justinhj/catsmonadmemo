@@ -18,11 +18,9 @@ object StackCalc {
     input.foldLeft(0.pure[CalcState]) {
 
       case (acc, in) =>
-
         acc.flatMap {
           _ => evalOne(in)
         }
-
     }
 
   }

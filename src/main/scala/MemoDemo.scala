@@ -1,6 +1,6 @@
-import cats.Foldable
-import cats.data.State
 
+import cats.data.State
+import cats.syntax.applicative._
 import scala.collection.immutable.Map
 
 // see https://typelevel.org/cats/datatypes/state.html
@@ -46,6 +46,23 @@ object MemoDemo {
         (result._1, result._2 :: acc)
     }
 
+  // like above but returns the state so it can be further composed before being run
+
+  def callMMany[A,B](inputs: List[A], initialState: State[Memo[A, B], List[B]]): State[Memo[A,B], List[B]] = {
+
+    inputs.foldLeft(initialState) {
+      case (s, in) =>
+        s.flatMap {
+          (bList: List[B]) =>
+            callM[A,B](in).map {
+              b =>
+                b :: bList
+            }
+        }
+    }
+  }
+
+
   // Create a function to memoize with
   def sampleFunc(n: Int) : String = {
     println(s"calculating $n")
@@ -88,8 +105,6 @@ object MemoDemo {
 
     val inputs = List(10,12,13,12,10,13,10,10,10,13,12,13,10,10)
 
-
-
     val result5 = inputs.foldLeft((Memo[Int,String](sampleFunc), List.empty[String])){
       case ((state : Memo[Int,String], acc : List[String]), input) =>
         val result = callM[Int, String](input).run(state).value
@@ -102,6 +117,17 @@ object MemoDemo {
 
     println("6) " + result6._2)
 
+    val initial: State[Memo[Int, String], List[String]] = State(s => (Memo[Int,String](sampleFunc, Map.empty), List.empty[String]))
+
+    // run call Many twice keeping the cache
+
+    val result7 = callMMany[Int,String](List(10, 10, 20), initial)
+
+    val result7b = callMMany[Int,String](List(10, 12, 20, 24), result7)
+
+    val runResult7: (Memo[Int, String], List[String]) = result7b.run(Memo[Int,String](sampleFunc, Map.empty)).value
+
+    println("7) " + runResult7)
   }
 
 
