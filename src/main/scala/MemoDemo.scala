@@ -1,3 +1,4 @@
+import cats.Foldable
 import cats.data.State
 
 import scala.collection.immutable.Map
@@ -45,15 +46,15 @@ object MemoDemo {
         (result._1, result._2 :: acc)
     }
 
+  // Create a function to memoize with
+  def sampleFunc(n: Int) : String = {
+    println(s"calculating $n")
+    s">${(n + 2).toString.reverse}<"
+  }
+
   def main(args : Array[String]) : Unit = {
 
     // simple function application
-
-    // Create a function to memoize with
-    def sampleFunc(n: Int) : String = {
-      println(s"calculating $n")
-      s">${(n + 2).toString.reverse}<"
-    }
 
     // Simple invocation
     val test1 = sampleFunc(10)
@@ -86,6 +87,8 @@ object MemoDemo {
     // run over a list of inputs
 
     val inputs = List(10,12,13,12,10,13,10,10,10,13,12,13,10,10)
+
+
 
     val result5 = inputs.foldLeft((Memo[Int,String](sampleFunc), List.empty[String])){
       case ((state : Memo[Int,String], acc : List[String]), input) =>
