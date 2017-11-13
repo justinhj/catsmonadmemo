@@ -3,6 +3,10 @@ import MemoDemo._
 import cats.data.State
 
 
+val m2 = List(1,2,3,4,5).map(n => fib(n))
+
+
+
 val t1 = sampleFunc(10)
 
 val m1 = Memo[Int, String](sampleFunc)

@@ -1,6 +1,8 @@
 
+import cats.Eval
 import cats.data.State
 import cats.syntax.applicative._
+
 import scala.collection.immutable.Map
 
 // see https://typelevel.org/cats/datatypes/state.html
@@ -69,6 +71,17 @@ object MemoDemo {
     s">${(n + 2).toString.reverse}<"
   }
 
+  // fibonacci
+
+  def fib(n: Eval[Long]) : Eval[Long] = {
+
+    println(s"calc fib $n")
+    if(n.value <= 1) Eval.now()
+    else
+      fib(n-1) + fib(n-2)
+
+  }
+
   def main(args : Array[String]) : Unit = {
 
     // simple function application
@@ -128,6 +141,23 @@ object MemoDemo {
     val runResult7 = result7b.run(Memo[Int,String](sampleFunc, Map.empty)).value
 
     println("7) " + runResult7)
+
+    val fib5 = fib(5)
+
+    println("fib5) " + fib5)
+
+    // memoize fib
+    val fib5m = callM(5L).run(Memo[Long,Long](fib, Map.empty))
+
+    println("fib5m) " + fib5m.value._2)
+
+    var x = 1
+    x = 2
+
+
+
+
+
   }
 
 
