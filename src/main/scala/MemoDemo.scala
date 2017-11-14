@@ -73,14 +73,46 @@ object MemoDemo {
 
   // fibonacci
 
-  def fib(n: Eval[Long]) : Eval[Long] = {
+  def fib(n: Long) : Long = {
 
     println(s"calc fib $n")
-    if(n.value <= 1) Eval.now()
+    if(n <= 1) 1
     else
       fib(n-1) + fib(n-2)
 
   }
+
+  // memoized fib
+
+  def fib2(n: Long) : Long = {
+
+    println(s"fib2 $n")
+
+    n match {
+      case 0 => 1
+      case 1 => 1
+      case m => fibonacci(m-2L) + fibonacci(m-1L)
+    }
+
+  }
+
+  val memoizedFib = Memo[Long,Long](fib2)
+
+  def fibonacci(n: Long) : Long = {
+
+    println(s"fibonacci $n")
+    memoizedFib(n)._2
+
+  }
+
+//  def fib(n: Eval[Long]) : Eval[Long] = {
+//
+//    println(s"calc fib $n")
+//    if(n.value <= 1) Eval.now()
+//    else
+//      fib(n-1) + fib(n-2)
+//
+//  }
 
   def main(args : Array[String]) : Unit = {
 
@@ -154,8 +186,12 @@ object MemoDemo {
     var x = 1
     x = 2
 
+//    val memFib5 = memFib(5)
+//
+//    memFib5.run(Memo[Long,Long](memFib, Map.empty))
+    val fibR = fibonacci(5L)
 
-
+    println("fibR) " + fibR)
 
 
   }
